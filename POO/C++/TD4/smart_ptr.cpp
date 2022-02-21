@@ -122,7 +122,7 @@ ostream& operator<<(ostream& stream, Ensemble ensemble){
 
 Ensemble& Ensemble::operator=(const Ensemble& ensemble){
     if(this == &ensemble){
-		cout << "Auto-affectation repérée ptit con" << endl;
+		cout << "Auto-affectation repérée" << endl;
 		return *this;
 	}
 	taille = ensemble.getTaille();

@@ -25,7 +25,7 @@ class Ensemble{
         Ensemble calculer_union(Ensemble A);
         Ensemble calculer_inter(Ensemble A);
 
-        friend ostream& operator<<(ostream&, Ensemble);
+        friend ostream& operator<<(ostream&, Ensemble&);
 };
 
 Ensemble::Ensemble(){
@@ -51,15 +51,6 @@ void Ensemble::afficher_info(){
 }
 
 bool Ensemble::contient(int k){
-    for (int i = 0 ; i < getTaille() ; i++){
-        if (T[i] == k){
-            return true;
-        }
-    }
-    return false;
-}
-/*
-bool Ensemble::contient(int k){
     if(getTaille() < 2){
         for (int i = 0 ; i < getTaille() ; i++){
             if (T[i] == k){
@@ -72,37 +63,42 @@ bool Ensemble::contient(int k){
         int vEnd = getTaille();
         int vMid = getTaille()/2;
         int vNow, i;
-        while(i < getTaille()){
+        while(i < vMid){
+            vMid = (vStart + vEnd)/2;
             if(k < vMid){
-                vMid = vMid/2;
+                vEnd = vMid;
             }else{
-                vMid = (vMid + vEnd)/2;
+                vStart = vMid;
             }
-            if(k == T[vMid]){
+            if(vStart == vEnd){
                 return true;
             }
             i++;
         }
         return false;
     }
-}*/
+}
 
 void Ensemble::retirer(int k){
     if (contient(k) == false){
-        //cout << "Valeur non présente dans l'ensemble !!!!!" << endl;
+        cout << "Valeur non présente dans l'ensemble !!!!!" << endl;
     }else{
         unique_ptr<int []> array;
         array = make_unique<int []>(getTaille() - 1);
-        for (int i = 0 ; i < getTaille() ; i++){
-            if(k > T[i] && T[i] != k){
-                array[i] = T[i];
-            }else{
-                array[i] = T[i+1];
+        int j = 0;
+        bool flag = true;
+        for (int i = 0 ; i < getTaille() - 1 ; i++){
+            if(flag == true && k == T[i]){
+                j++;
+                flag = false;
             }
+            array[i] = T[j];
+            j++;
         }
         T = move(array);
+        cout << "test" << endl;
         taille--;
-        //cout << "Valeur supprimée de l'ensemble !" << endl;
+        cout << "Valeur supprimée de l'ensemble !" << endl;
     }
 }
 
@@ -151,7 +147,7 @@ void Ensemble::ajouter(int k){
         }
         T = move(array);
         taille++;
-        //cout << "Valeur ajoutée à l'ensemble !" << endl;
+        cout << "Valeur ajoutée à l'ensemble !" << endl;
     }
 }
 
@@ -176,7 +172,7 @@ Ensemble Ensemble::calculer_inter(Ensemble A){
     return C;
 }
 
-ostream& operator<<(ostream& stream, Ensemble ensemble){
+ostream& operator<<(ostream& stream, Ensemble& ensemble){
     for (int i = 0 ; i < ensemble.getTaille() ; i++){
         stream << ensemble.T[i] << "\t";
     }
@@ -186,7 +182,7 @@ ostream& operator<<(ostream& stream, Ensemble ensemble){
 
 Ensemble& Ensemble::operator=(const Ensemble& ensemble){
     if(this == &ensemble){
-		cout << "Auto-affectation repérée ptit con" << endl;
+		cout << "Auto-affectation repérée" << endl;
 		return *this;
 	}
 	taille = ensemble.getTaille();
@@ -222,5 +218,7 @@ int main(){
     cout << P;
     P.retirer(8);
     cout << P;
-    // cout << P.contient(8);
+    P.retirer(2);
+    cout << P;
+    cout << P.contient(8);
 }

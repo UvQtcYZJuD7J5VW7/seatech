@@ -22,18 +22,20 @@ class Vehicule{
 		Vehicule();
         Vehicule(const Vehicule&);
 		Vehicule(int k, int v=130);
-		~Vehicule();
+		virtual ~Vehicule();
 		void afficher();
-		void accelerer();
-		Vehicule attacher(Vehicule);
-		Vehicule multiplier(double);
+		virtual void accelerer();
+		//Vehicule attacher(Vehicule);
+		//Vehicule multiplier(double);
 
-		Vehicule operator+(Vehicule); // Attacher un véhicule
-		Vehicule operator*(double); // Multiplier la vitesse du véhicule
+		//Vehicule operator+(Vehicule); // Attacher un véhicule
+		//Vehicule operator*(double); // Multiplier la vitesse du véhicule
 		Vehicule& operator=(const Vehicule&); // Recopier les attributs d'un véhicule
 
-		friend Vehicule operator*(double, Vehicule);
-		friend ostream& operator<<(ostream&, Vehicule);
+		//friend Vehicule operator*(double, Vehicule);
+		friend ostream& operator<<(ostream&, const Vehicule&);
+
+        virtual string returnSpeedUnit() = 0;
 };
 
 int Vehicule::getVitesse() const
@@ -107,6 +109,7 @@ Vehicule::Vehicule(int k, int v)
 
 Vehicule::~Vehicule()
 {
+    cout << "destruction vehicule" << endl;
 }
 
 void Vehicule::afficher()
@@ -125,7 +128,7 @@ void Vehicule::accelerer()
 		setVitesse(getVitesseMax());
 	}
 }
-
+/*
 Vehicule Vehicule::attacher(Vehicule b) 
 {	
 	Vehicule att;
@@ -152,7 +155,7 @@ Vehicule Vehicule::multiplier(double coef)
 Vehicule Vehicule::operator*(double coef)
 {
 	return multiplier(coef);
-}
+}*/
 
 Vehicule& Vehicule::operator=(const Vehicule& vehicule) 
 {
@@ -167,7 +170,7 @@ Vehicule& Vehicule::operator=(const Vehicule& vehicule)
 	cout << "Copie effectuée" << endl;
 	return *this;
 }
-
+/*
 Vehicule operator*(double coef, Vehicule vehicule)
 {
 	Vehicule newVehicle;
@@ -175,19 +178,19 @@ Vehicule operator*(double coef, Vehicule vehicule)
 	newVehicle.setPoids(vehicule.getPoids());
 	newVehicle.setVitesse(vehicule.getVitesse() * coef);
 	return newVehicle;
-}
+}*/
 
-ostream& operator<<(ostream& stream, Vehicule vehicule)
+ostream& operator<<(ostream& stream, const Vehicule& vehicule)
 {
 	stream << vehicule.getVitesse() << "/" << vehicule.getVitesseMax() << " km/h\tPoids : " << vehicule.getPoids() << endl;
 	return stream;
 }
-
+/*
 double energ(Vehicule vehicule)
 {
 	return .5 * vehicule.getPoids() * pow(vehicule.getVitesse(), 2);
 }
-
+*/
 class Bateau : public Vehicule{
     protected:
         int tirant;
@@ -197,10 +200,14 @@ class Bateau : public Vehicule{
         void setTirant(int k) {if(k>0) tirant = k;}
 
         Bateau() {setVitesseMax(50); setTirant(10); cout << "construction bateau" << endl;}
+        ~Bateau() {cout << "destruction bateau" << endl;}
         Bateau(const Bateau&);
 
         bool testSafetyNav(int prof);
         Bateau& operator=(const Bateau&);
+        void accelerer();
+
+        string returnSpeedUnit() {return "noeuds";}
 };
 
 Bateau::Bateau(const Bateau& b) : Vehicule(b){
@@ -228,14 +235,79 @@ Bateau& Bateau::operator=(const Bateau& b){
 	return *this;
 }
 
+void Bateau::accelerer()
+{
+	if(getVitesse() + 5 < getVitesseMax()) 
+	{
+		setVitesse(getVitesse() + 5);
+	}
+	else
+	{
+		setVitesse(getVitesseMax());
+	}
+}
+
 int tirantInCharge(Bateau B, int charge){
     return B.getTirant() + charge;
 }
 
-int main() {
-    Bateau A, B;
-    B.setTirant(5);
-    A = B;
-    cout << A.getTirant() << endl;
-    cout << B.getTirant() << endl;
+class Avion : public Vehicule{
+    protected:
+        int altitude;
+
+    public:
+        int getAltitude() const {return altitude;}
+        void setAltitude(int k) {if(k>0) altitude = k;}
+
+        Avion() {setVitesseMax(800); setAltitude(30000); cout << "construction avion" << endl;}
+        ~Avion() {cout << "destruction avion" << endl;}
+        Avion(const Avion&);
+
+        Avion& operator=(const Avion&);
+        void accelerer();
+
+        string returnSpeedUnit() {return "machs";}
+};
+
+Avion::Avion(const Avion& b) : Vehicule(b){
+    cout << "recopie avion" << endl;
+    setAltitude(b.getAltitude());
+}
+
+void Avion::accelerer()
+{
+	if(getVitesse() + 100 < getVitesseMax()) 
+	{
+		setVitesse(getVitesse() + 100);
+	}
+	else
+	{
+		setVitesse(getVitesseMax());
+	}
+}
+
+Avion& Avion::operator=(const Avion& b){
+    if(this == &b)
+	{
+		cout << "Auto-affectation repérée avion" << endl;
+		return *this;
+	}
+	Vehicule::operator=(b);
+    setAltitude(b.getAltitude());
+	cout << "Copie effectuée avion" << endl;
+	return *this;
+}
+
+int main(){
+    Vehicule** Tab = new Vehicule*[3];
+    Tab[0] = new Bateau;
+    Tab[1] = new Avion;
+    Tab[2] = new Bateau;
+    for (int i=0; i<3; i++){
+        cout << (*Tab[i]).getVitesseMax();
+        cout << Tab[i]->returnSpeedUnit() << endl;
+    }
+    delete Tab[0];
+    delete Tab[1];
+    delete Tab[2];
 }

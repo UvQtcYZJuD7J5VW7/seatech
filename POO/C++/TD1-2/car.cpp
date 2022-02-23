@@ -20,7 +20,7 @@ class Vehicule{
 		
 		void ralentir();
 		Vehicule();
-		Vehicule(int v, int vm=130);
+		Vehicule(int k, int v=130);
 		~Vehicule();
 		void afficher();
 		void accelerer();
@@ -88,7 +88,10 @@ Vehicule::Vehicule()
 	setPoids(1);
 }
 
-Vehicule::Vehicule(it take se);
+Vehicule::Vehicule(int k, int v)
+{
+	setVitesseMax(v);
+	setVitesse(k);
 	setPoids(1);
 }
 
